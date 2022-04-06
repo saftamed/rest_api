@@ -1,6 +1,7 @@
 require("dotenv").config({ path: "./config/.env" });
 let mongoose = require("mongoose");
 const User = require("./models/User");
+const bodyParser = require('body-parser')
 
 
 const express = require("express");
@@ -21,9 +22,8 @@ mongoose
     console.error("Database connection error");
   });
 
-// to support json and URL-encoded bodies
-app.use(express.json());
-app.use(express.urlencoded());
+  // parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
 
 
 // add new user
@@ -33,7 +33,6 @@ app.post("/user", function (req, res) {
 
   user.save(function (err, data) {
     if (err) {
-      res.status(409);
       res.send("Data not inserted");
       console.log(err);
     } else {
@@ -46,7 +45,6 @@ app.post("/user", function (req, res) {
 app.get("/users", function (req, res) {
   User.find(function (err, data) {
     if (err) {
-      res.status(409);
       res.send("Data not fetched");
       console.log(err);
     } else {
@@ -67,7 +65,6 @@ app.put("/update", function (req, res) {
     },
     function (err, data) {
       if (err) {
-        res.status(409);
         res.send("Data not fetched");
         console.log(err);
       } else {
@@ -82,6 +79,7 @@ app.put("/update", function (req, res) {
 app.delete("/delete", function (req, res) {
   User.findByIdAndDelete(req.body.id, function (err, data) {
     if (err) {
+      res.send("Data not Deleted");
       console.log(err);
     } else {
       res.send(data);
@@ -90,8 +88,6 @@ app.delete("/delete", function (req, res) {
   });
 });
 
-
-//star the server
-app.listen(4000, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log("server Started !!");
 });
